@@ -351,6 +351,7 @@
 "Assets/DestructibleWallGenerator/DWG/Scripts/DWGPhysicsCheck.cs"
 "Assets/DestructibleWallGenerator/DWG/Scripts/DWGTagManager.cs"
 "Assets/DestructibleWallGenerator/Example/Scripts/CameraFreeRoam.cs"
+"Assets/DestructibleWallGenerator/Example/Scripts/CameraShake.cs"
 "Assets/DestructibleWallGenerator/Example/Scripts/ThrowObject.cs"
 -langversion:9.0
 

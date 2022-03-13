@@ -1,33 +1,61 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class ThrowObject : MonoBehaviour {
-	public float force = 300f;
+	public float force = 0f;
+	public float force_final = 300f;
 	private float update;
 	private float direction = 0f;
+	public float distance_hypocentre = 0f;
 
+
+	void Start(){
+		GameObject epicentre = GameObject.Find("Epicentre");
+		epicentre.GetComponent<Renderer>().enabled = false;
+	}
 
 	void OnGUI()
 	{
-		force = GUI.HorizontalSlider(new Rect(25, 25, 800, 200), force, 0.0F, 1200.0F);
+		force_final = GUI.HorizontalSlider(new Rect(25, 25, 800, 25), force_final, 0.0F, 1200.0F);
+		distance_hypocentre = GUI.HorizontalSlider(new Rect(25, 50, 800, 25), distance_hypocentre, 0.0F, 30.0F);
+
+		GameObject hypocentre = GameObject.Find("Hypocentre");
+		hypocentre.transform.position = transform.position + new Vector3(0, -distance_hypocentre, 0);
+
 		if (GUI.Button(new Rect(600,250,180,120),"Lancer le séisme"))
-
 		 {
-			while (direction < 1f)
-			{
-				Throw(direction,0,1-direction);
-				Throw(-direction,0,1-direction);
-				Throw(direction,0,-(1-direction));
-				Throw(-direction,0,-(1-direction));
-				direction += 0.05f;
+			force = force_final/4;
+			StartCoroutine(DestroyWallsPause());
 			}
-			direction = 0;
-		}
 	}
 
+	IEnumerator DestroyWallsPause()
+    {
+			float decalage = 0f;
+			var components =  Resources.FindObjectsOfTypeAll<GameObject>().Where(obj => obj.name == "Wall");
+			while (force < force_final){
+				foreach (GameObject comp in components){
+					comp.AddComponent<CameraShake>().shakeAmount = force/1000;
+				}
+				yield return new WaitForSeconds(1.25f);
+				while (direction < 1.0f)
+				{
+						Throw(direction,0,1-direction);
+						Throw(-direction,0,1-direction);
+						Throw(direction,0,-(1-direction));
+						Throw(-direction,0,-(1-direction));
+						direction += 0.1f;
+				}
+					decalage += 0.03f;
+					direction = 0 + decalage;
+					force += 100;
+					if (force_final < force) { force = force_final;}
 
-	void Update(){
-	}
+			}
+
+    }
+
 
 	// Create a sphere and throw it
 	void Throw(float x, float y, float z){
