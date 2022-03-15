@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/DestructibleWallGenerator/Example/Scene/DestructibleWallGenerator.unity
+- path: Assets/Cartoon_Texture_Pack/_MaterialLibrary/Cartoon_Texture_Presentation.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0

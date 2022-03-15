@@ -4,6 +4,7 @@ using System.Linq;
 
 public class ThrowObject : MonoBehaviour {
 	public float force = 0f;
+	public float force_final_gui = 300f;
 	public float force_final = 300f;
 	private float update;
 	private float direction = 0f;
@@ -17,7 +18,7 @@ public class ThrowObject : MonoBehaviour {
 
 	void OnGUI()
 	{
-		force_final = GUI.HorizontalSlider(new Rect(25, 25, 800, 25), force_final, 0.0F, 1200.0F);
+		force_final_gui = GUI.HorizontalSlider(new Rect(25, 25, 800, 25), force_final_gui, 0.0F, 1200.0F);
 		distance_hypocentre = GUI.HorizontalSlider(new Rect(25, 50, 800, 25), distance_hypocentre, 0.0F, 30.0F);
 
 		GameObject hypocentre = GameObject.Find("Hypocentre");
@@ -25,6 +26,7 @@ public class ThrowObject : MonoBehaviour {
 
 		if (GUI.Button(new Rect(600,250,180,120),"Lancer le séisme"))
 		 {
+			force_final += force_final_gui + 300 - distance_hypocentre*10;
 			force = force_final/4;
 			StartCoroutine(DestroyWallsPause());
 			}

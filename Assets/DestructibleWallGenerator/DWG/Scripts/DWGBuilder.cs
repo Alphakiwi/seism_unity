@@ -7,30 +7,30 @@ using System.Linq;
 
 namespace DWG {
 	public static class DWGBuilder {
-	
+
 		public static GameObject destructibleObject, finalPosition;
 		public static int createPrefab, upAxis, colliderType, length, height, sides;
 		public static bool hasPhysics, checkPhysics, _singleCollider;
 		public static Vector3 createPrefabSize;
 		public static Material createPrefabMat;
-		
+		public static string nameBrick = "Brick";
 		private static GameObject newWall;
 		private static Vector3 objectScale;
 		private static Bounds meshSize;
-		
+
 		public static void Build(){
 			if(destructibleObject){
-				objectScale = destructibleObject.transform.localScale; 
+				objectScale = destructibleObject.transform.localScale;
 			} else {
 				objectScale = new Vector3(1,1,1);
 			}
 			Generate(Wall());
 	    }
-	    
+
 		static void Generate(GameObject newWall){
 			float newRot = 0; // Set a float for a new rotation angle
 			Vector3 startPos = newWall.transform.position; // Create a new starting position based on the newWall game object
-			
+
 			for(int i= 0; i < sides; i++){
 				if(i == 0){
 					GameObject northWall = NorthWall(newWall); // Create a new game object using the NorthWall() returned game object
@@ -38,21 +38,21 @@ namespace DWG {
 					CenterOfChildren(northWall.transform);
 					AddColliders(northWall.transform); // Call the add colliders function for the northWall
 				} else {
-					newRot += 90; 
-					float meshX = meshSize.size.x * objectScale.x; 
+					newRot += 90;
+					float meshX = meshSize.size.x * objectScale.x;
 					float meshZ;
 					if(upAxis == 0){
-						meshZ = meshSize.size.y * objectScale.y; 
+						meshZ = meshSize.size.y * objectScale.y;
 					}else{
-						meshZ = meshSize.size.z * objectScale.z; 
+						meshZ = meshSize.size.z * objectScale.z;
 					}
-	
+
 					Vector3 newPos = Vector3.zero; // Set a new vector3
 					GameObject newSide = new GameObject(); // Create a new empty game object
-					
+
 					if(i==1){
 						newSide.gameObject.name = "EastWall"; // Name the object East Wall
-						newPos = new Vector3((meshX * length) - ((meshX / 2) + (meshZ / 2)),0, 
+						newPos = new Vector3((meshX * length) - ((meshX / 2) + (meshZ / 2)),0,
 											 -((meshX / 2) + (meshZ / 2)));
 					} else if(i==2){
 						newSide.gameObject.name = "SouthWall";// Name the object South Wall
@@ -63,10 +63,10 @@ namespace DWG {
 						newPos = new Vector3(-(meshX * length) + ((meshX / 2) + (meshZ / 2)),0,
 											 (meshX / 2) + (meshZ / 2));
 	                }
-	                
-	            
+
+
 	                startPos += newPos; // adds the start position and the new position together
-	                newSide.transform.parent = newWall.transform; // sets the new game object 
+	                newSide.transform.parent = newWall.transform; // sets the new game object
 	                newSide.transform.position = startPos; // newSide game object position is set to the start position that the above equation handled
 					BuildWall(startPos, newSide); // Build a new wall! using the start position and the new game object
 					newSide.transform.localEulerAngles = new Vector3(0,newRot,0); // Oh yeah, and rotate that new wall based on the newRot
@@ -75,7 +75,7 @@ namespace DWG {
 	            }
 	        }
 			CenterOfChildren(newWall.transform);
-			
+
 			if(finalPosition != null){
 				newWall.transform.position = finalPosition.transform.position;
 			} else {
@@ -87,7 +87,7 @@ namespace DWG {
 				}
 			}
 	    }
-	    
+
 		static GameObject Wall(){
 			newWall = new GameObject(); // Create an empty game object
 			newWall.name = "Wall"; // Name the emtpy game object Wall
@@ -101,11 +101,11 @@ namespace DWG {
 			northWall.transform.parent = newWall.transform; // Set the newly created empty game objects parent to the object that was carried over (newWall)
 			return northWall; // Return the newly created empty game object named NorthWall
 		}
-	    
+
 		static void BuildWall(Vector3 nextPos, GameObject newSide){
 			for(int i = 0; i < height; i++){
 				if(i > 0){
-					Vector3 newPos = Vector3.zero; // Set a new vector3 
+					Vector3 newPos = Vector3.zero; // Set a new vector3
 					if(upAxis == 0){
 						newPos = new Vector3(meshSize.extents.x * objectScale.x,meshSize.size.z * objectScale.z,0);
 					} else {
@@ -121,7 +121,7 @@ namespace DWG {
 				AddBricks(nextPos, newSide);
 			}
 		}
-		
+
 		static void AddBricks(Vector3 nextPos, GameObject newSide)
 		{
 			for(int i = 0; i < length; i++){
@@ -137,7 +137,7 @@ namespace DWG {
 						newPiece.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Diffuse"));
 					}
 				}
-				newPiece.name = "Brick";
+				newPiece.name = nameBrick;
 				newPiece.transform.position = nextPos;
 				// ^- Instantiate your brick prefab at the nextPos using the prefabs rotation
 				newPiece.transform.parent = newSide.transform; // Set the instantiated objects parent to be thew newSide game object
@@ -146,7 +146,7 @@ namespace DWG {
 				nextPos += newPosX; // Next position is set to next position plus the newpositionX. this is so the next brick will be placed beside this one
 			}
 		}
-		
+
 		static void AddColliders(Transform parent){
 			if(_singleCollider){
 				if(parent.GetComponent<Collider>()){
@@ -158,7 +158,7 @@ namespace DWG {
 					}
 				parent.gameObject.AddComponent<BoxCollider>();
 				BoxCollider boxCol = parent.gameObject.GetComponent<BoxCollider>();
-				
+
 				if(upAxis == 0){
 					boxCol.size = new Vector3(((meshSize.size.x * length) + meshSize.extents.x) * objectScale.x,
 				    	                      (meshSize.size.z * height) * objectScale.z,
@@ -168,7 +168,7 @@ namespace DWG {
 					                          (meshSize.size.y * height) * objectScale.y,
 					                          meshSize.size.z * objectScale.z);
 				}
-				
+
 				if(colliderType != 0) {
 					parent.gameObject.GetComponent<Collider>().enabled = false; // Disable colliders
 					parent.gameObject.AddComponent<DWGColliderEnabler>(); // This adds a collider enabler to the brick. This way the collider only enables when the game is in play. That way you can move objects in the scene view without delay
@@ -194,7 +194,7 @@ namespace DWG {
 							DWGTagManager.AddTag(destroyTag);
 						}
 						child.gameObject.tag = destroyTag;
-						
+
 			            child.gameObject.AddComponent<Rigidbody>(); // This adds a rigidbody to the child game object
 			            child.GetComponent<Rigidbody>().isKinematic = true; // Set isKinematic to true so that physics aren't enabled on the child object
 			            if(checkPhysics){
@@ -208,7 +208,7 @@ namespace DWG {
 		        }
 	        }
 	    }
-	    
+
 		static void CenterOfChildren(Transform parent){
 			List<Transform> children = parent.Cast<Transform>().ToList();
 			Vector3 pos = Vector3.zero;
